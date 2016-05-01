@@ -1,0 +1,124 @@
+<DOCTYPE html>
+	<html>
+		<head>
+			<title>Ambient Music Generator</title>
+			<meta charset="utf-8">
+			<script type="text/javascript">
+
+				function modulate() {
+				var canvas = document.getElementById("modulator");
+				var ctx = canvas.getContext("2d");
+
+				var startAngle = (2*Math.PI);
+				var endAngle = (Math.PI*1.5);
+				var currentAngle = 0;
+				//the x and y coordinates the circles will be centered on
+				var xCoord = 500, yCoord = 300;
+
+				//this array holds the circles and some information about them
+				var circles = [{color : "red",
+							   clicked : false,
+							   sample : "/Users/CCB/desktop/html/thenmsun/samples/c1.wav",
+							   currentAngle : 0},
+							   {color : "orange",
+								clicked : false,
+								sample : "/Users/CCB/desktop/html/thenmsun/samples/e1.wav",
+								currentAngle : 0},
+							   {color : "yellow",
+								clicked : false,
+								sample : "/Users/CCB/desktop/html/thenmsun/samples/g1.wav",
+							    currentAngle : 0},
+							   {color : "green",
+								clicked : false,
+								sample : "/Users/CCB/desktop/html/thenmsun/samples/c2.wav",
+							    currentAngle : 0},
+							   {color : "blue", 
+								clicked : false,
+								sample : "/Users/CCB/desktop/html/thenmsun/samples/e2.wav",
+							    currentAngle : 0},
+							   {color : "purple",
+								clicked : false,
+								sample : "/Users/CCB/desktop/html/thenmsun/samples/g2.wav",
+							    currentAngle : 0}];
+
+				function drawCircles() {
+					//draw 6 circles (different colors of the rainbow)
+					for (var i = 0, radius = 30; i < 6; i++, radius += 30) {
+						ctx.beginPath();
+						ctx.arc(xCoord, yCoord, radius, 
+								startAngle + circles[i].currentAngle, 
+								circles[i].currentAngle + endAngle, false);
+						ctx.strokeStyle = circles[i].color;
+						ctx.lineWidth = 20;
+						ctx.stroke();
+					}
+				}
+				//draw initial circles
+				drawCircles(currentAngle);
+
+				function Update() {
+    				//Clears
+    				ctx.clearRect(0,0,canvas.width,canvas.height);
+					//Drawing
+    				drawCircles();
+    				for (var i = 0; i < 6; i++)
+    					if (circles[i].clicked)
+    						circles[i].currentAngle += 0.02;
+
+    				window.requestAnimationFrame(Update);
+				}
+
+				function rotateOnClick(e) {
+					var rect = canvas.getBoundingClientRect();
+					var x = e.clientX - rect.left, 
+						y = e.clientY - rect.top;
+					var clickDist = Math.sqrt(Math.pow(x - 500, 2) + 
+											  Math.pow(y - 300, 2) );
+					var coords = "X coord: " + x + ", Y coords: " + y + 
+								 " clickDist: " + clickDist;
+					document.getElementById("coords").innerHTML = coords;
+					var clickedCircle;
+					//red circle was clicked
+					if (clickDist >= 20 && clickDist <= 40) {
+						circles[0].clicked = true;
+						clickedCircle = 0;
+					}//orange circle was clicked
+					else if (clickDist >= 50 && clickDist <= 70) {
+						circles[1].clicked = true;
+						clickedCircle = 1;
+					}//yellow circle was clicked
+					else if (clickDist >= 80 && clickDist <= 100) {
+						circles[2].clicked = true;
+						clickedCircle = 2;
+					}//green circle was clicked
+					else if (clickDist >= 110 && clickDist <= 130) {
+						circles[3].clicked = true;
+						clickedCircle = 3;
+					}//blue circle was clicked
+					else if (clickDist >= 140 && clickDist <= 160) {
+						circles[4].clicked = true;
+						clickedCircle = 4;
+					}//purple circle was clicked
+					else if (clickDist >= 170 && clickDist <= 190) {
+						circles[5].clicked = true;
+						clickedCircle = 5;
+					}
+					//play the sample associated with the clicked circle
+					var audio = new Audio(circles[clickedCircle].sample);
+					audio.loop = true;
+					audio.play();
+					//FIXME - BUG CAUSING THE ANIMATION TO SPEED UP EVERYTIME
+					//A NEW RING IS CLICKED
+					//e.target.removeEventListener(e.type, arguments.callee);
+					Update();
+				}//rotateOnClick()
+				canvas.addEventListener("click", rotateOnClick);
+			}//modulate()
+			</script>
+		</head>
+		<body>
+			<canvas id="modulator" width = "1000" height="500"></canvas>
+			<script>modulate();</script> 
+			<p id="coords"></p>
+		</body>
+	</html>
